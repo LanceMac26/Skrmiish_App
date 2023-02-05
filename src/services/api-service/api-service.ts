@@ -1,8 +1,6 @@
 import { Status } from '@tshttp/status';
 import { State } from '../../models/State';
 
-// type StatusCode = typeof Status[keyof typeof Status]
-
 export interface IStateService {
     getStates(): Promise<State[]>
 
@@ -12,5 +10,5 @@ export interface IStateService {
     deleteState(id: number): Promise<typeof Status[keyof typeof Status]>;
 
     // Checking if blacklisted
-    isBlacklisted(stateName: string | undefined, stateCode: string | undefined): Promise<Boolean>;
+    isBlacklisted(stateName: string | undefined): Promise<Boolean>;
 }

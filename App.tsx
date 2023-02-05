@@ -15,6 +15,7 @@ import ModalComponent from './src/components/Modal/Modal';
 export default function App() {
   const [location, setLocation] = useState<LocationObject>();
   const [errorMsg, setErrorMsg] = useState('');
+  const API_URL = 'https://ca84-41-10-141-68.sa.ngrok.io';  // To be moved to a .env file.
 
   useEffect(() => {
     (async () => {
@@ -48,54 +49,134 @@ export default function App() {
     locationDetails = location.coords;
   }
   
+  // #region Services
+  
   const apiService = {
       async getStates(): Promise<State[]> {
-          return [];
+        let returnObj: State[] = [];
+        const url = `${API_URL}/api/States`; 
+
+        await fetch(url)
+                .then((x) => x.json())
+                .then((resp) => returnObj = resp)
+                .catch((error) => console.error(error))
+                .finally(() => {});
+
+        return returnObj;
       },
   
       async createState(state: State): Promise<Number> {
-        return 0;
+        const url = `${API_URL}/api/States`; 
+        let returnObj: number = 0;
+        let data = { 
+          method: 'POST',
+          body: JSON.stringify(state),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          }
+        }
+        
+        await fetch(url, data)
+                .then(response => response.json())
+                .then(json => returnObj = json.status)
+                .catch((error) => console.error(error))
+                .finally(() => {});
+
+        return returnObj;
       },
 
       async getState(id: number): Promise<State> {
-        return {
-            stateId: 0,
-            countryId: 0,
-            stateCode: 'string',
-            StateName: 'string',
-            isBlacklisted: false,
-        
-            createdDate: new Date(),
-            lastModifiedDate: new Date(),
-            isDeleted: false,
-            createdBy: 'string',
-            lastModifiedBy: 'string'
-        }
+        let returnObj: State = {
+          stateId: 0,
+          countryId: 0,
+          stateCode: 'string',
+          StateName: 'string',
+          isBlacklisted: false,
+      
+          createdDate: new Date(),
+          lastModifiedDate: new Date(),
+          isDeleted: false,
+          createdBy: 'string',
+          lastModifiedBy: 'string'
+        };
+
+        const url = `${API_URL}/api/States/${id}`; 
+
+        await fetch(url)
+                .then((x) => x.json())
+                .then((resp) => returnObj = resp)
+                .catch((error) => console.error(error))
+                .finally(() => {});
+
+        return returnObj;
       },
 
       async updateState(state: State): Promise<State> {
-        return {
-            stateId: 0,
-            countryId: 0,
-            stateCode: 'string',
-            StateName: 'string',
-            isBlacklisted: false,
-        
-            createdDate: new Date(),
-            lastModifiedDate: new Date(),
-            isDeleted: false,
-            createdBy: 'string',
-            lastModifiedBy: 'string'
+        const url = `${API_URL}/api/States`; 
+        let returnObj: State = {
+          stateId: 0,
+          countryId: 0,
+          stateCode: 'string',
+          StateName: 'string',
+          isBlacklisted: false,
+      
+          createdDate: new Date(),
+          lastModifiedDate: new Date(),
+          isDeleted: false,
+          createdBy: 'string',
+          lastModifiedBy: 'string'
+        };
+
+        let data = { 
+          method: 'POST',
+          body: JSON.stringify(state),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          }
         }
+        
+        await fetch(url, data)
+                .then(response => response.json())
+                .then(json => returnObj = json.status)
+                .catch((error) => console.error(error))
+                .finally(() => {});
+
+        return returnObj;
       },
 
       async deleteState(id: number): Promise<typeof Status[keyof typeof Status]> {
+        const url = `${API_URL}/api/States/${id}`; 
+        let data = { 
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          }
+        }
+        
+        await fetch(url, data)
+                .then(response => response.json())
+                .catch((error) => console.error(error))
+                .finally(() => {});
+
         return Status.Ok;
       },
   
       // Checking if blacklisted
-      async isBlacklisted(stateName: string | undefined, stateCode: string | undefined): Promise<Boolean>{
-        return false;
+      async isBlacklisted(stateCode: string): Promise<Boolean> {
+        let returnObj: boolean = false;
+
+        const url = `${API_URL}/api/States/isBlacklisted/${stateCode}`; 
+
+        await fetch(url)
+                .then((x) => x.json())
+                .then((resp) => returnObj = resp)
+                .catch((error) => console.error(error))
+                .finally(() => {});
+
+        return returnObj;
       }
   }
 
@@ -147,6 +228,8 @@ export default function App() {
       return returnObj;
     }
   }
+
+  //#endregion
   
   return (
     <>
@@ -156,6 +239,7 @@ export default function App() {
             <ModalComponent />
             <Text>Tech Assessment for Skrmiish!</Text>
             <Text></Text>
+            <Text>Your Location: </Text>
             <Text>Latitude: {locationDetails.latitude != 0 ? locationDetails.latitude : "Waiting..."}</Text>
             <Text>Longitude: {locationDetails.longitude != 0 ? locationDetails.longitude : "Waiting..."}</Text>
           </View>
@@ -171,46 +255,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
   },
 });
