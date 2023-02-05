@@ -28,7 +28,7 @@ export interface Location {
     lastModifiedDate: Date,
     isDeleted: boolean,
     createdBy: string,
-    lastModifiedBy: string
+    lastModifiedBy: string,
 
     latitude: number, 
     longitude: number, 
